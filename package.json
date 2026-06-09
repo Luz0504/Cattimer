@@ -22,6 +22,7 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2",
     "@types/node": "^22.19.20",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
