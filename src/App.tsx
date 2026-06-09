@@ -559,6 +559,8 @@ export default function App() {
     setShowSettings(false);
   };
 
+  const tab: CurrentTab = activeTab;
+
   return (
     <div className="min-h-screen font-sans bg-app-bg text-app-text transition-colors duration-300">
       
@@ -602,7 +604,7 @@ export default function App() {
                         id="tab-dashboard"
                         onClick={() => setActiveTab('dashboard')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all active:scale-98 text-center cursor-pointer ${
-                          activeTab === 'dashboard'
+                          tab === 'dashboard'
                             ? 'bg-violet-600 text-white dark:bg-violet-500 shadow-xs'
                             : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
                         }`}
@@ -614,7 +616,7 @@ export default function App() {
                         id="tab-timer"
                         onClick={() => setActiveTab('timer')}
                         className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all active:scale-98 text-center cursor-pointer ${
-                          activeTab === 'timer'
+                          tab === 'timer'
                             ? 'bg-violet-600 text-white dark:bg-violet-500 shadow-xs'
                             : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 hover:bg-zinc-200/50 dark:hover:bg-zinc-800/50'
                         }`}

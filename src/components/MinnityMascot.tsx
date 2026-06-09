@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, Variants } from 'motion/react';
 
 export type MinnityExpression = 'friendly' | 'sleeping' | 'focused' | 'happy' | 'thinking';
 
@@ -90,7 +90,7 @@ export default function MinnityMascot({
         rotate: [0, -15, 10, -15, 0],
         transition: { repeat: Infinity, duration: 5, ease: 'easeInOut' },
       },
-    };
+    } satisfies Variants;
 
     // Ear twitch variants
     const earLeftVariants = {
@@ -136,7 +136,7 @@ export default function MinnityMascot({
         rotate: [0, 1, -1, 0],
         transition: { repeat: Infinity, duration: 6, ease: 'easeInOut' },
       },
-    };
+    } satisfies Variants;
 
     return (
       <motion.svg
