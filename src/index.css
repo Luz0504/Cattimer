@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-brand-violet: #8B5CF6;
+  --color-page-bg: #F8FAFC; /* Soft slate off-white for beautiful depth */
+  --color-page-text: #0F172A; /* Deep ink gray/black (contrast 19:1) */
+  --color-card-bg: #FFFFFF; /* Pure white card layout layer */
+  --color-card-border: #E2E8F0; /* Clean border contrast */
+
+  /* Explicit and high-contrast color token variables for light theme */
+  --color-zinc-300: #475569; /* Slate-600: Contrast 6.2:1 against white! Excellent for metatext */
+  --color-zinc-400: #334155; /* Slate-700: Contrast 8.5:1 against white! Perfect readability */
+  --color-zinc-450: #1E293B; /* Slate-800: Contrast 11.7:1 against white */
+  --color-zinc-500: #0F172A; /* Slate-900: Contrast 19:1 against white */
+  --color-zinc-600: #0F172A; /* Slate-900 */
+  --color-zinc-650: #0F172A; /* Slate-900 */
+  --color-zinc-700: #0F172A; /* Slate-900 */
+  --color-zinc-800: #0F172A; /* Slate-900 */
+}
+
+.dark {
+  --color-brand-violet: #8B5CF6;
+  --color-page-bg: #0B0F19; /* Darker navy slate background, incredibly deep and beautiful */
+  --color-page-text: #F8FAFC; /* High contrast light text */
+  --color-card-bg: #131B2E; /* Dark slate card layer */
+  --color-card-border: #1E293B; /* Subtle cool border */
+
+  /* Comfortable, high-readability grays for dark theme */
+  --color-zinc-300: #94A3B8;
+  --color-zinc-400: #94A3B8;
+  --color-zinc-450: #94A3B8;
+  --color-zinc-500: #E2E8F0;
+  --color-zinc-600: #F1F5F9;
+  --color-zinc-650: #F1F5F9;
+  --color-zinc-700: #F8FAFC;
+  --color-zinc-800: #F8FAFC;
+}
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-brand: var(--color-brand-violet);
+  --color-app-bg: var(--color-page-bg);
+  --color-app-text: var(--color-page-text);
+  --color-app-card: var(--color-card-bg);
+  --color-app-border: var(--color-card-border);
+
+  /* Explicitly wire the override variables to tailwind themes */
+  --color-zinc-300: var(--color-zinc-300);
+  --color-zinc-400: var(--color-zinc-400);
+  --color-zinc-450: var(--color-zinc-450);
+  --color-zinc-500: var(--color-zinc-500);
+  --color-zinc-600: var(--color-zinc-600);
+  --color-zinc-650: var(--color-zinc-650);
+  --color-zinc-700: var(--color-zinc-700);
+  --color-zinc-800: var(--color-zinc-800);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-page-bg);
+  color: var(--color-page-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Custom gorgeous styling for slider track */
+input[type="range"]::-webkit-slider-thumb {
+  border: 2px solid #ffffff;
+  height: 20px;
+  width: 20px;
+  border-radius: 9999px;
+  background: #8B5CF6;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.4);
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Cattimer",
+  "description": "Asistente virtual oficial Minnity: organizador de tareas para personas que procrastinan con priorización inteligente, listas balanceadas y Pomodoro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
