@@ -58,7 +58,7 @@ export default function TaskList({
 
   // Helper to format due dates nicely
   const formatFriendlyDate = (dateString: string) => {
-    const todayStr = '2026-06-03';
+    const todayStr = new Date().toISOString().split('T')[0];
     if (dateString === todayStr) {
       return 'Hoy 📅';
     }
@@ -419,3 +419,4 @@ export default function TaskList({
     </div>
   );
 }
+
