@@ -5,8 +5,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Pause, RotateCw, Coffee, Brain, BatteryLow, Zap, Plus, Minus, Bell, BellOff } from 'lucide-react';
+import { Play, Pause, RotateCw, Coffee, Brain, BatteryLow, Zap, Plus, Minus } from 'lucide-react';
 import { PomodoroModeType, PomodoroModeConfig } from '../types';
+import { sendNotification } from '@tauri-apps/plugin-notification';
 import MinnityMascot, { MinnityExpression } from './MinnityMascot';
 
 const POMODORO_MODES: PomodoroModeConfig[] = [
@@ -120,36 +121,7 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
   const [suggestion, setSuggestion] = useState<string>(BREAK_SUGGESTIONS[0]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Browser Notification integration state
-  const [notifPermission, setNotifPermission] = useState<string>(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      return Notification.permission;
-    }
-    return 'unsupported';
-  });
 
-  const requestNotificationPermission = () => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      Notification.requestPermission().then((permission) => {
-        setNotifPermission(permission);
-      });
-    }
-  };
-
-  const sendBrowserNotification = (title: string, body: string) => {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      try {
-        const notif = new Notification(title, {
-          body,
-          icon: '/favicon.ico',
-        });
-        // Auto-close notification after 6 seconds
-        setTimeout(() => notif.close(), 6000);
-      } catch (e) {
-        console.error('Error sending browser notification:', e);
-      }
-    }
-  };
 
   // Configure Minnity Mascot based on timer states
   const getMinnityMascotConfig = (): { expression: MinnityExpression; text: string } => {
@@ -208,18 +180,12 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
       setSuggestion(BREAK_SUGGESTIONS[randIdx]);
       if (!silent) {
         playTimerSound('finish');
-        sendBrowserNotification(
-          '¡Tiempo de descansar, miau! 🐾',
-          'Terminó tu bloque de concentración. ¡Tomate un respiro bien merecido!'
-        );
+        sendNotification({ title: 'Cattimer', body: '¡Tiempo de descansar, miau! 🐾 — Terminó tu bloque de concentración.' });
       }
     } else {
       if (!silent) {
         playTimerSound('start');
-        sendBrowserNotification(
-          '¡Hora de activarse, miau! ⚡',
-          'Terminó tu descanso. Volvemos a enfocarnos con toda la energía.'
-        );
+        sendNotification({ title: 'Cattimer', body: '¡Hora de activarse, miau! ⚡ — Terminó tu descanso. Volvemos a enfocarnos.' });
       }
     }
   };
@@ -361,68 +327,6 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
       {/* Timer engine layout */}
       <div className="bg-app-card border border-app-border rounded-3xl p-4 sm:p-6 md:p-8 shadow-xl w-full min-w-0 overflow-hidden">
         
-        {/* Notification Permission Indicator Row */}
-        {notifPermission !== 'unsupported' && (
-          <div className="w-full -mt-2 mb-6" id="desktop-notification-banner">
-            {notifPermission === 'default' && (
-              <div 
-                id="notification-request-window"
-                className="w-full flex flex-col md:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-zinc-50 border border-zinc-200 dark:bg-zinc-900/70 dark:border-zinc-800/80 shadow-xs transition-all"
-              >
-                <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-3 w-full">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600 dark:bg-violet-950/60 dark:text-violet-400">
-                    <Bell className="h-5 w-5 animate-bounce" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-xs text-zinc-950 dark:text-zinc-50">
-                      ¿Querés avisos del temporizador?
-                    </h4>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">
-                      Activá las notificaciones de escritorio para sonarte alarmas miau cuando termines tus bloques de pomodoro o de recreo.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
-                  <button
-                    type="button"
-                    id="btn-enable-notifications"
-                    onClick={requestNotificationPermission}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-violet-600 hover:bg-violet-700 active:scale-95 text-white dark:bg-violet-500 dark:hover:bg-violet-600 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs"
-                  >
-                    Activar Notificaciones 🔔
-                  </button>
-                </div>
-              </div>
-            )}
-            {notifPermission === 'granted' && (
-              <div className="flex items-center justify-center">
-                <span
-                  style={{
-                    backgroundColor: theme === 'dark' ? '#0d0d0d' : '#ffffff',
-                    borderColor: theme === 'dark' ? '#ffffff' : '#e4e4e7',
-                    color: theme === 'dark' ? '#ffffff' : '#18181b',
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 border rounded-full text-[11px] font-semibold"
-                >
-                  <Bell size={12} />
-                  Notificaciones de escritorio activadas 🔔
-                </span>
-              </div>
-            )}
-            {notifPermission === 'denied' && (
-              <div className="flex items-center justify-center">
-                <span 
-                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-zinc-50 dark:bg-zinc-850 text-zinc-400 dark:text-zinc-500 rounded-full text-[11px] font-medium border border-zinc-200/50 dark:border-zinc-800" 
-                  title="Habilitalas en la configuración de sitio de tu navegador si querés recibirlas"
-                >
-                  <BellOff size={12} />
-                  Notificaciones bloqueadas por el navegador (habilitalas en el candado si deseas avisos)
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Toggle Mode headers */}
         <div className="flex flex-col sm:flex-row justify-center gap-2 mb-6">
           {POMODORO_MODES.map((mode, index) => {

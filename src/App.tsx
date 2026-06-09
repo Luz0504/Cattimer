@@ -28,9 +28,8 @@ import AppHeader from './components/AppHeader';
 import TaskProgressChart from './components/TaskProgressChart';
 import { Task, OnboardingData, CurrentTab } from './types';
 import { prioritizeTasks, ensurePlannedTodayProps } from './utils/prioritization';
-import { initAuth, googleSignIn, logout, getAccessToken, getAccessTokenSync } from './utils/googleAuth';
+import { initAuth, googleSignIn, logout, getAccessToken, getAccessTokenSync } from './utils/googleOAuth';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './utils/googleCalendar';
-import { User } from 'firebase/auth';
 import { getMascotMessage } from './utils/mascotMessages';
 
 export default function App() {
@@ -86,7 +85,7 @@ export default function App() {
   const [googleConnected, setGoogleConnected] = useState<boolean>(() => {
     return localStorage.getItem('cattimer-google-connected') === 'true';
   });
-  const [googleUser, setGoogleUser] = useState<User | null>(null);
+  const [googleUser, setGoogleUser] = useState<{ email: string } | null>(null);
 
   // Initialize auth state on load
   useEffect(() => {
