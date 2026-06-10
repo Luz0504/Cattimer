@@ -40,9 +40,13 @@ export default function PomodoroWidget() {
       }, 500);
     });
     const unlistenClose = appWindow.onCloseRequested(async () => {
+      console.log('[PomodoroWidget] Close requested via X button');
       const pos = await appWindow.outerPosition();
+      console.log('[PomodoroWidget] Saving position:', pos);
       await saveWidgetPosition('pomodoro', pos.x, pos.y);
-      emit('WIDGET_CLOSED', { type: 'pomodoro' });
+      console.log('[PomodoroWidget] Emitting WIDGET_CLOSED');
+      await emit('WIDGET_CLOSED', { type: 'pomodoro' });
+      console.log('[PomodoroWidget] WIDGET_CLOSED emitted, window will be destroyed by onCloseRequested');
     });
 
     return () => {

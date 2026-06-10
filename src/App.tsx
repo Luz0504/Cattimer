@@ -815,7 +815,7 @@ export default function App() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-app-card rounded-3xl max-w-md w-full border border-app-border p-6 shadow-2xl relative space-y-6 text-app-text"
+                  className="bg-app-card rounded-3xl max-w-md w-full border border-app-border p-6 shadow-2xl relative text-app-text flex flex-col max-h-[90vh]"
                 >
                   <button
                     type="button"
@@ -826,227 +826,233 @@ export default function App() {
                     <X size={18} />
                   </button>
 
-                  <div className="border-b border-app-border pb-2">
-                    <h3 className="text-lg font-extrabold text-app-text font-display">
-                      Configuración de Cattimer
-                    </h3>
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
-                      Adaptá a Minnity y los límites a tu ritmo de trabajo actual.
-                    </p>
+                  <div className="shrink-0">
+                    <div className="border-b border-app-border pb-2">
+                      <h3 className="text-lg font-extrabold text-app-text font-display">
+                        Configuración de Cattimer
+                      </h3>
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                        Adaptá a Minnity y los límites a tu ritmo de trabajo actual.
+                      </p>
+                    </div>
                   </div>
 
-                  {/* Form fields inside adjustments dialog */}
-                  <div className="space-y-4 text-left">
-                    
-                    {/* Adjustable Obstacle Reason select */}
-                    <div className="space-y-1.5">
-                      <label htmlFor="settings-reason-select" className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                        Obstáculo de Procrastinación
-                      </label>
-                      <select
-                        id="settings-reason-select"
-                        value={procrastinationReason}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setProcrastinationReason(val);
-                          localStorage.setItem('cattimer-onboarding-reason', val);
-                          setMascotExpression('happy');
-                          setBubbleText(getMascotMessage(val, 'onboardingSelect'));
-                        }}
-                        className="w-full text-sm font-semibold text-app-text bg-app-bg p-3 rounded-xl border border-app-border focus:ring-2 focus:ring-violet-500 focus:outline-hidden cursor-pointer"
-                      >
-                        <option value="Distracciones" className="bg-app-card text-app-text">⚡ Distracciones</option>
-                        <option value="Redes sociales" className="bg-app-card text-app-text">📱 Redes sociales</option>
-                        <option value="Videojuegos" className="bg-app-card text-app-text">🎮 Videojuegos</option>
-                        <option value="Falta de motivación" className="bg-app-card text-app-text">💭 Falta de motivación</option>
-                        <option value="Ansiedad" className="bg-app-card text-app-text">😰 Ansiedad</option>
-                        <option value="Demasiadas tareas" className="bg-app-card text-app-text">📚 Demasiadas tareas</option>
-                        <option value="Cansancio" className="bg-app-card text-app-text">😴 Cansancio</option>
-                        <option value="Dificultad para empezar" className="bg-app-card text-app-text">⏳ Dificultad para empezar</option>
-                        <option value="Otra" className="bg-app-card text-app-text">❓ Otra razón</option>
-                      </select>
-                    </div>
-
-                    {/* Adjustable Limit slider */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                        <span>Límite Diario Saludable</span>
-                        <span
-                          style={{ backgroundColor: '#8b4ae0', color: '#e4deff' }}
-                          className="px-2 py-0.5 rounded-lg border border-violet-200 dark:border-violet-900/30 font-mono font-black"
+                  <div className="overflow-y-auto flex-1 min-h-0 space-y-6 pt-4">
+                    {/* Form fields inside adjustments dialog */}
+                    <div className="space-y-4 text-left">
+                      
+                      {/* Adjustable Obstacle Reason select */}
+                      <div className="space-y-1.5">
+                        <label htmlFor="settings-reason-select" className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                          Obstáculo de Procrastinación
+                        </label>
+                        <select
+                          id="settings-reason-select"
+                          value={procrastinationReason}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setProcrastinationReason(val);
+                            localStorage.setItem('cattimer-onboarding-reason', val);
+                            setMascotExpression('happy');
+                            setBubbleText(getMascotMessage(val, 'onboardingSelect'));
+                          }}
+                          className="w-full text-sm font-semibold text-app-text bg-app-bg p-3 rounded-xl border border-app-border focus:ring-2 focus:ring-violet-500 focus:outline-hidden cursor-pointer"
                         >
-                          {dailyLimit} tareas
-                        </span>
+                          <option value="Distracciones" className="bg-app-card text-app-text">⚡ Distracciones</option>
+                          <option value="Redes sociales" className="bg-app-card text-app-text">📱 Redes sociales</option>
+                          <option value="Videojuegos" className="bg-app-card text-app-text">🎮 Videojuegos</option>
+                          <option value="Falta de motivación" className="bg-app-card text-app-text">💭 Falta de motivación</option>
+                          <option value="Ansiedad" className="bg-app-card text-app-text">😰 Ansiedad</option>
+                          <option value="Demasiadas tareas" className="bg-app-card text-app-text">📚 Demasiadas tareas</option>
+                          <option value="Cansancio" className="bg-app-card text-app-text">😴 Cansancio</option>
+                          <option value="Dificultad para empezar" className="bg-app-card text-app-text">⏳ Dificultad para empezar</option>
+                          <option value="Otra" className="bg-app-card text-app-text">❓ Otra razón</option>
+                        </select>
                       </div>
-                      <input
-                        id="settings-limit-range"
-                        type="range"
-                        min="1"
-                        max="10"
-                        value={dailyLimit}
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value);
-                          setDailyLimit(val);
-                          localStorage.setItem('cattimer-onboarding-limit', String(val));
-                          
-                          // Re-evaluate task distribution with the new limit
-                          setTasks((prev) => {
-                            const clearedTasks = prev.map((t) => {
-                              if (!t.completed) {
-                                return { ...t, plannedToday: undefined };
-                              }
-                              return t;
-                            });
-                            
-                            const { todayTasks: newToday } = prioritizeTasks(clearedTasks, val);
-                            const todayIds = new Set(newToday.map((t) => t.id));
-                            
-                            return prev.map((t) => {
-                              if (t.completed) return t;
-                              return {
-                                ...t,
-                                plannedToday: todayIds.has(t.id),
-                              };
-                            });
-                          });
 
-                          setMascotExpression('focused');
-                          setBubbleText(getMascotMessage(procrastinationReason, 'limitChanged', val));
-                        }}
-                        className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-violet-600"
-                      />
-                    </div>
+                      {/* Adjustable Limit slider */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                          <span>Límite Diario Saludable</span>
+                          <span
+                            style={{ backgroundColor: '#8b4ae0', color: '#e4deff' }}
+                            className="px-2 py-0.5 rounded-lg border border-violet-200 dark:border-violet-900/30 font-mono font-black"
+                          >
+                            {dailyLimit} tareas
+                          </span>
+                        </div>
+                        <input
+                          id="settings-limit-range"
+                          type="range"
+                          min="1"
+                          max="10"
+                          value={dailyLimit}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            setDailyLimit(val);
+                            localStorage.setItem('cattimer-onboarding-limit', String(val));
+                            
+                            // Re-evaluate task distribution with the new limit
+                            setTasks((prev) => {
+                              const clearedTasks = prev.map((t) => {
+                                if (!t.completed) {
+                                  return { ...t, plannedToday: undefined };
+                                }
+                                return t;
+                              });
+                              
+                              const { todayTasks: newToday } = prioritizeTasks(clearedTasks, val);
+                              const todayIds = new Set(newToday.map((t) => t.id));
+                              
+                              return prev.map((t) => {
+                                if (t.completed) return t;
+                                return {
+                                  ...t,
+                                  plannedToday: todayIds.has(t.id),
+                                };
+                              });
+                            });
 
-                    {/* Google Calendar integration block */}
-                    <div className="space-y-2 pt-2 border-t border-app-border">
-                      <span className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                        Integración Google Calendar
-                      </span>
-                      {googleConnected ? (
-                        <div className="bg-emerald-500/5 dark:bg-emerald-950/10 p-3 rounded-2xl border border-emerald-500/10 dark:border-emerald-500/5 space-y-2.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                              🚀 Conectado con éxito
-                            </span>
+                            setMascotExpression('focused');
+                            setBubbleText(getMascotMessage(procrastinationReason, 'limitChanged', val));
+                          }}
+                          className="w-full h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-violet-600"
+                        />
+                      </div>
+
+                      {/* Google Calendar integration block */}
+                      <div className="space-y-2 pt-2 border-t border-app-border">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                          Integración Google Calendar
+                        </span>
+                        {googleConnected ? (
+                          <div className="bg-emerald-500/5 dark:bg-emerald-950/10 p-3 rounded-2xl border border-emerald-500/10 dark:border-emerald-500/5 space-y-2.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                🚀 Conectado con éxito
+                              </span>
+                              <button
+                                type="button"
+                                onClick={handleDisconnectGoogle}
+                                className="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                              >
+                                Desconectar
+                              </button>
+                            </div>
+                            {googleUser && (
+                              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+                                Email de sincronización: <strong className="font-semibold break-all text-app-text">{googleUser.email}</strong>
+                              </p>
+                            )}
+                            <p className="text-[10px] text-zinc-450 dark:text-zinc-500 leading-relaxed italic">
+                              🐾 ¡Miau! Las tareas que decidas sincronizar se guardarán automáticamente en tu calendario de Google.
+                            </p>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              backgroundColor: theme === 'dark' ? '#18181b' : '#ffffff',
+                              borderColor: theme === 'dark' ? '#3f3f46' : '#939393',
+                              color: theme === 'dark' ? '#f4f4f5' : '#000000',
+                            }}
+                            className="p-3 rounded-2xl border space-y-2"
+                          >
+                            <p
+                              style={{ color: theme === 'dark' ? '#d4d4d8' : '#171717' }}
+                              className="text-[11px] leading-relaxed font-semibold text-zinc-500"
+                            >
+                              Vinculá tu cuenta para habilitar la opción de guardar tus pendientes y plazos en Google Calendar al instante.
+                            </p>
                             <button
                               type="button"
-                              onClick={handleDisconnectGoogle}
-                              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline cursor-pointer"
+                              onClick={handleConnectGoogle}
+                              className="w-full py-2 px-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                             >
-                              Desconectar
+                              <span>📅 Conectar Google Calendar</span>
                             </button>
                           </div>
-                          {googleUser && (
-                            <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                              Email de sincronización: <strong className="font-semibold break-all text-app-text">{googleUser.email}</strong>
-                            </p>
-                          )}
-                          <p className="text-[10px] text-zinc-450 dark:text-zinc-500 leading-relaxed italic">
-                            🐾 ¡Miau! Las tareas que decidas sincronizar se guardarán automáticamente en tu calendario de Google.
-                          </p>
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            backgroundColor: theme === 'dark' ? '#18181b' : '#ffffff',
-                            borderColor: theme === 'dark' ? '#3f3f46' : '#939393',
-                            color: theme === 'dark' ? '#f4f4f5' : '#000000',
-                          }}
-                          className="p-3 rounded-2xl border space-y-2"
-                        >
-                          <p
-                            style={{ color: theme === 'dark' ? '#d4d4d8' : '#171717' }}
-                            className="text-[11px] leading-relaxed font-semibold text-zinc-500"
-                          >
-                            Vinculá tu cuenta para habilitar la opción de guardar tus pendientes y plazos en Google Calendar al instante.
-                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                      {/* Widgets Flotantes section */}
+                      <div className="space-y-2 pt-2 border-t border-app-border">
+                        <span className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                          🪟 Widgets Flotantes
+                        </span>
+                        <p className="text-[10px] text-zinc-450 dark:text-zinc-500 leading-relaxed italic">
+                          Abrí ventanas flotantes independientes para mantener el control sin cambiar de foco.
+                        </p>
+                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
+                          <span className="text-xs font-semibold flex items-center gap-1.5">
+                            ⏱️ Pomodoro Widget
+                          </span>
                           <button
                             type="button"
-                            onClick={handleConnectGoogle}
-                            className="w-full py-2 px-3 bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                            id="btn-toggle-pomodoro-widget"
+                            onClick={handleTogglePomodoroWidget}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              widgetPomodoroOpen
+                                ? 'bg-violet-600 text-white shadow-xs'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
+                            }`}
                           >
-                            <span>📅 Conectar Google Calendar</span>
+                            {widgetPomodoroOpen ? 'Activo' : 'Inactivo'}
                           </button>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                        <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
+                          <span className="text-xs font-semibold flex items-center gap-1.5">
+                            📋 Tareas Widget
+                          </span>
+                          <button
+                            type="button"
+                            id="btn-toggle-tasks-widget"
+                            onClick={handleToggleTasksWidget}
+                            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              widgetTasksOpen
+                                ? 'bg-violet-600 text-white shadow-xs'
+                                : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
+                            }`}
+                          >
+                            {widgetTasksOpen ? 'Activo' : 'Inactivo'}
+                          </button>
+                        </div>
+                      </div>
 
-                    {/* Widgets Flotantes section */}
-                    <div className="space-y-2 pt-2 border-t border-app-border">
-                      <span className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                        🪟 Widgets Flotantes
-                      </span>
-                      <p className="text-[10px] text-zinc-450 dark:text-zinc-500 leading-relaxed italic">
-                        Abrí ventanas flotantes independientes para mantener el control sin cambiar de foco.
+                    {/* Danger zone / Reset parameters */}
+                    <div className="bg-rose-500/5 dark:bg-rose-950/10 p-4 rounded-2xl border border-rose-500/10 space-y-3">
+                      <h4 className="text-xs font-bold text-rose-700 dark:text-rose-450 uppercase tracking-widest flex items-center gap-1.5">
+                        <RotateCcw size={12} /> Zona de Reinicio
+                      </h4>
+                      <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                        Si querés volver a tomar la pregunta inicial y resetear totalmente tus tareas cargadas, hacé clic debajo. Esta acción no se puede deshacer.
                       </p>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
-                        <span className="text-xs font-semibold flex items-center gap-1.5">
-                          ⏱️ Pomodoro Widget
-                        </span>
-                        <button
-                          type="button"
-                          id="btn-toggle-pomodoro-widget"
-                          onClick={handleTogglePomodoroWidget}
-                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                            widgetPomodoroOpen
-                              ? 'bg-violet-600 text-white shadow-xs'
-                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
-                          }`}
-                        >
-                          {widgetPomodoroOpen ? 'Activo' : 'Inactivo'}
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
-                        <span className="text-xs font-semibold flex items-center gap-1.5">
-                          📋 Tareas Widget
-                        </span>
-                        <button
-                          type="button"
-                          id="btn-toggle-tasks-widget"
-                          onClick={handleToggleTasksWidget}
-                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                            widgetTasksOpen
-                              ? 'bg-violet-600 text-white shadow-xs'
-                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
-                          }`}
-                        >
-                          {widgetTasksOpen ? 'Activo' : 'Inactivo'}
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        id="btn-settings-restart-profile"
+                        onClick={handleResetApp}
+                        className="w-full py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all active:scale-95"
+                      >
+                        Reiniciar de Cero (Onboarding) 🐾
+                      </button>
                     </div>
-
-                  {/* Danger zone / Reset parameters */}
-                  <div className="bg-rose-500/5 dark:bg-rose-950/10 p-4 rounded-2xl border border-rose-500/10 space-y-3">
-                    <h4 className="text-xs font-bold text-rose-700 dark:text-rose-450 uppercase tracking-widest flex items-center gap-1.5">
-                      <RotateCcw size={12} /> Zona de Reinicio
-                    </h4>
-                    <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-relaxed">
-                      Si querés volver a tomar la pregunta inicial y resetear totalmente tus tareas cargadas, hacé clic debajo. Esta acción no se puede deshacer.
-                    </p>
-                    <button
-                      type="button"
-                      id="btn-settings-restart-profile"
-                      onClick={handleResetApp}
-                      className="w-full py-2 px-3 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all active:scale-95"
-                    >
-                      Reiniciar de Cero (Onboarding) 🐾
-                    </button>
                   </div>
 
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      id="btn-settings-save"
-                      onClick={() => {
-                        setShowSettings(false);
-                        setBubbleText(getProcrastinationGreeting(procrastinationReason));
-                        setMascotExpression('happy');
-                      }}
-                      className="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm rounded-2xl shadow transition-all active:scale-95"
-                    >
-                      Listo miau
-                    </button>
+                  <div className="shrink-0 pt-3">
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        id="btn-settings-save"
+                        onClick={() => {
+                          setShowSettings(false);
+                          setBubbleText(getProcrastinationGreeting(procrastinationReason));
+                          setMascotExpression('happy');
+                        }}
+                        className="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm rounded-2xl shadow transition-all active:scale-95"
+                      >
+                        Listo miau
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               </div>

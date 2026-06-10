@@ -36,9 +36,13 @@ export default function TasksWidget() {
       }, 500);
     });
     const unlistenClose = appWindow.onCloseRequested(async () => {
+      console.log('[TasksWidget] Close requested via X button');
       const pos = await appWindow.outerPosition();
+      console.log('[TasksWidget] Saving position:', pos);
       await saveWidgetPosition('tasks', pos.x, pos.y);
-      emit('WIDGET_CLOSED', { type: 'tasks' });
+      console.log('[TasksWidget] Emitting WIDGET_CLOSED');
+      await emit('WIDGET_CLOSED', { type: 'tasks' });
+      console.log('[TasksWidget] WIDGET_CLOSED emitted, window will be destroyed by onCloseRequested');
     });
 
     return () => {
