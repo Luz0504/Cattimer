@@ -46,6 +46,7 @@ pub fn run() {
   tauri::Builder::default()
     .plugin(tauri_plugin_notification::init())
     .plugin(tauri_plugin_opener::init())
+    .plugin(tauri_plugin_store::Builder::default().build())
     .invoke_handler(tauri::generate_handler![start_auth_server])
     .setup(|app| {
       if cfg!(debug_assertions) {

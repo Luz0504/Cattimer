@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Sun,
@@ -31,6 +31,10 @@ import { prioritizeTasks, ensurePlannedTodayProps } from './utils/prioritization
 import { initAuth, googleSignIn, logout, getAccessToken, getAccessTokenSync } from './utils/googleOAuth';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from './utils/googleCalendar';
 import { getMascotMessage } from './utils/mascotMessages';
+import { emit, listen } from '@tauri-apps/api/event';
+import { WebviewWindow } from '@tauri-apps/api/webviewWindow';
+import type { TasksWidgetState } from './widgets/types';
+import { createWidget, destroyWidget, isWidgetOpen } from './widgets/windowManager';
 
 export default function App() {
   // Theme state saved to localStorage
@@ -86,6 +90,16 @@ export default function App() {
     return localStorage.getItem('cattimer-google-connected') === 'true';
   });
   const [googleUser, setGoogleUser] = useState<{ email: string } | null>(null);
+
+  // Widget toggle states
+  const [widgetPomodoroOpen, setWidgetPomodoroOpen] = useState(false);
+  const [widgetTasksOpen, setWidgetTasksOpen] = useState(false);
+
+  // Initialize widget state from store on mount
+  useEffect(() => {
+    isWidgetOpen('pomodoro').then(setWidgetPomodoroOpen);
+    isWidgetOpen('tasks').then(setWidgetTasksOpen);
+  }, []);
 
   // Initialize auth state on load
   useEffect(() => {
@@ -358,6 +372,19 @@ export default function App() {
   // Prioritize active tasks using smart utility logic
   const { todayTasks, pendingTasks } = prioritizeTasks(tasks, dailyLimit);
 
+  // Emit current tasks state to widgets
+  useEffect(() => {
+    const { todayTasks, pendingTasks } = prioritizeTasks(tasks, dailyLimit);
+    const payload: TasksWidgetState = {
+      theme,
+      todayTasks,
+      pendingTasks,
+      mascotExpression,
+      mascotText: bubbleText,
+    };
+    emit('TASKS_STATE_UPDATE', payload);
+  }, [tasks, dailyLimit, theme, mascotExpression, bubbleText]);
+
   // Add Task handler
   const handleAddTask = async (taskData: Omit<Task, 'id' | 'completed' | 'createdAt'>) => {
     const activeTodayCount = tasks.filter((t) => !t.completed && t.plannedToday === true).length;
@@ -487,6 +514,32 @@ export default function App() {
     );
   };
 
+  // Ref for handleToggleComplete (used by widget event listener)
+  const handleToggleCompleteRef = useRef(handleToggleComplete);
+  handleToggleCompleteRef.current = handleToggleComplete;
+
+  // Listen for widget events (TASK_TOGGLE, OPEN_MAIN_WINDOW)
+  useEffect(() => {
+    const toggleUnlisten = listen<{ id: string }>('TASK_TOGGLE', (event) => {
+      handleToggleCompleteRef.current(event.payload.id);
+    });
+    const openUnlisten = listen('OPEN_MAIN_WINDOW', async () => {
+      const mainWindow = await WebviewWindow.getByLabel('main');
+      if (mainWindow) {
+        await mainWindow.setFocus();
+      }
+    });
+    const widgetCloseUnlisten = listen<{ type: 'pomodoro' | 'tasks' }>('WIDGET_CLOSED', (event) => {
+      if (event.payload.type === 'pomodoro') setWidgetPomodoroOpen(false);
+      if (event.payload.type === 'tasks') setWidgetTasksOpen(false);
+    });
+    return () => {
+      toggleUnlisten.then(fn => fn());
+      openUnlisten.then(fn => fn());
+      widgetCloseUnlisten.then(fn => fn());
+    };
+  }, []);
+
   // Delete task completely
   const handleDeleteTask = async (id: string) => {
     const taskToDelete = tasks.find((t) => t.id === id);
@@ -547,6 +600,29 @@ export default function App() {
     });
     setMascotExpression('focused');
     setBubbleText('¡Miau! Acabo de restablecer y recalcular el orden y la distribución óptima de tus tareas basándome en su importancia y cercanía. 🐾⚙️');
+  };
+
+  // Widget toggle handlers
+  const handleTogglePomodoroWidget = async () => {
+    const open = await isWidgetOpen('pomodoro');
+    if (open) {
+      await destroyWidget('pomodoro');
+      setWidgetPomodoroOpen(false);
+    } else {
+      const win = await createWidget('pomodoro');
+      setWidgetPomodoroOpen(win !== null);
+    }
+  };
+
+  const handleToggleTasksWidget = async () => {
+    const open = await isWidgetOpen('tasks');
+    if (open) {
+      await destroyWidget('tasks');
+      setWidgetTasksOpen(false);
+    } else {
+      const win = await createWidget('tasks');
+      setWidgetTasksOpen(win !== null);
+    }
   };
 
   // Reset all parameters to re-onboard
@@ -711,20 +787,12 @@ export default function App() {
                   />
                 </motion.div>
               )}
-
-              {activeTab === 'timer' && (
-                <motion.div
-                  key="timer-tab-content"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* Built-in countdown timer */}
-                  <PomodoroTimer activeTab={activeTab} setActiveTab={setActiveTab} theme={theme} />
-                </motion.div>
-              )}
             </AnimatePresence>
+
+            {/* Timer panel - always mounted (visually hidden when not on timer tab) so widget events can reach it */}
+            <div className={activeTab !== 'timer' ? 'hidden' : ''}>
+              <PomodoroTimer activeTab={activeTab} setActiveTab={setActiveTab} theme={theme} />
+            </div>
             
           </main>
 
@@ -903,6 +971,50 @@ export default function App() {
                       )}
                     </div>
                   </div>
+
+                    {/* Widgets Flotantes section */}
+                    <div className="space-y-2 pt-2 border-t border-app-border">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                        🪟 Widgets Flotantes
+                      </span>
+                      <p className="text-[10px] text-zinc-450 dark:text-zinc-500 leading-relaxed italic">
+                        Abrí ventanas flotantes independientes para mantener el control sin cambiar de foco.
+                      </p>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
+                        <span className="text-xs font-semibold flex items-center gap-1.5">
+                          ⏱️ Pomodoro Widget
+                        </span>
+                        <button
+                          type="button"
+                          id="btn-toggle-pomodoro-widget"
+                          onClick={handleTogglePomodoroWidget}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            widgetPomodoroOpen
+                              ? 'bg-violet-600 text-white shadow-xs'
+                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
+                          }`}
+                        >
+                          {widgetPomodoroOpen ? 'Activo' : 'Inactivo'}
+                        </button>
+                      </div>
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-50/50 dark:bg-zinc-800/20 border border-app-border">
+                        <span className="text-xs font-semibold flex items-center gap-1.5">
+                          📋 Tareas Widget
+                        </span>
+                        <button
+                          type="button"
+                          id="btn-toggle-tasks-widget"
+                          onClick={handleToggleTasksWidget}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            widgetTasksOpen
+                              ? 'bg-violet-600 text-white shadow-xs'
+                              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 border border-app-border'
+                          }`}
+                        >
+                          {widgetTasksOpen ? 'Activo' : 'Inactivo'}
+                        </button>
+                      </div>
+                    </div>
 
                   {/* Danger zone / Reset parameters */}
                   <div className="bg-rose-500/5 dark:bg-rose-950/10 p-4 rounded-2xl border border-rose-500/10 space-y-3">

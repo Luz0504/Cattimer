@@ -8,6 +8,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Play, Pause, RotateCw, Coffee, Brain, BatteryLow, Zap, Plus, Minus } from 'lucide-react';
 import { PomodoroModeType, PomodoroModeConfig } from '../types';
 import { sendNotification } from '@tauri-apps/plugin-notification';
+import { emit, listen } from '@tauri-apps/api/event';
+import type { PomodoroWidgetState } from '../widgets/types';
 import MinnityMascot, { MinnityExpression } from './MinnityMascot';
 
 const POMODORO_MODES: PomodoroModeConfig[] = [
@@ -120,8 +122,6 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
   // Track previous mode/state to avoid loops and show appropriate suggestions
   const [suggestion, setSuggestion] = useState<string>(BREAK_SUGGESTIONS[0]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-
 
   // Configure Minnity Mascot based on timer states
   const getMinnityMascotConfig = (): { expression: MinnityExpression; text: string } => {
@@ -254,6 +254,22 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
     };
   }, [isActive, isBreak, activeModeIdx, customTotalDuration]);
 
+  // Emit current Pomodoro state to widgets
+  useEffect(() => {
+    const payload: PomodoroWidgetState = {
+      theme,
+      secondsLeft,
+      totalSeconds: customTotalDuration,
+      isBreak,
+      isActive,
+      activeModeIdx,
+      currentModeName: currentMode.name,
+      progressPercent: ((customTotalDuration - secondsLeft) / customTotalDuration) * 100,
+      formattedTime: formatTime(secondsLeft),
+    };
+    emit('POMODORO_STATE_UPDATE', payload);
+  }, [secondsLeft, isBreak, isActive, activeModeIdx, customTotalDuration, theme]);
+
   // Format HH:MM:SS or MM:SS
   const formatTime = (secs: number) => {
     const h = Math.floor(secs / 3600);
@@ -285,6 +301,32 @@ export default function PomodoroTimer({ activeTab = 'timer', setActiveTab, theme
     setIsActive(false);
     triggerPhaseTransition(!isBreak, true);
   };
+
+  // Refs for handler functions (used by widget event listeners to avoid stale closures)
+  const handleToggleRef = useRef(handleToggleTimer);
+  handleToggleRef.current = handleToggleTimer;
+  const handleResetRef = useRef(handleResetTimer);
+  handleResetRef.current = handleResetTimer;
+  const handleSkipRef = useRef(handleSkipPhase);
+  handleSkipRef.current = handleSkipPhase;
+
+  // Listen for control events from widgets
+  useEffect(() => {
+    const toggleUnlisten = listen('POMODORO_TOGGLE', () => {
+      handleToggleRef.current();
+    });
+    const resetUnlisten = listen('POMODORO_RESET', () => {
+      handleResetRef.current();
+    });
+    const skipUnlisten = listen('POMODORO_SKIP', () => {
+      handleSkipRef.current();
+    });
+    return () => {
+      toggleUnlisten.then(fn => fn());
+      resetUnlisten.then(fn => fn());
+      skipUnlisten.then(fn => fn());
+    };
+  }, []);
 
   return (
     <div id="pomodoro-timer-view" className="space-y-6">
